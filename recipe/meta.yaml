@@ -1,4 +1,4 @@
-{% set name = "svt-av1" %}
+{% set name = "SVT-AV1" %}
 {% set version = "3.1.2" %}
 
 package:
@@ -6,8 +6,8 @@ package:
   version: {{ version }}
 
 source:
-  url: https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v{{ version }}/SVT-AV1-v{{ version }}.tar.gz
-  sha256: d0d73bfea42fdcc1222272bf2b0e2319e9df5574721298090c3d28315586ecb1
+  url: https://gitlab.com/AOMediaCodec/{{ name|lower }}/-/archive/v{{ version }}/{{ name|lower }}-v{{ version }}.tar.gz
+  sha256: 084720e7818cec7cb38d31ab478478b910d643fe5b13fc2cfcbd9da9c9d5c84b
 
 build:
   number: 0
@@ -17,8 +17,8 @@ build:
 
 requirements:
   build:
-    - {{ compiler('c') }}
     - {{ stdlib("c") }}
+    - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - cmake
     - make  # [unix]
@@ -26,8 +26,10 @@ requirements:
 
 test:
   commands:
-    - test -f $PREFIX/include/svt-av1/EbSvtAv1.h     # [unix]
-    - test -f $PREFIX/lib/libSvtAv1Enc${SHLIB_EXT}   # [unix]
+    - test -f ${PREFIX}/include/svt-av1/EbSvtAv1.h          # [unix]
+    - test -f ${PREFIX}/lib/libSvtAv1Enc${SHLIB_EXT}        # [unix]
+    - if not exist %LIBRARY_BIN%\SvtAv1Enc.dll exit 1       # [win]
+    - if not exist %LIBRARY_INC%\svt-av1/EbSvtAv1.h exit 1  # [win]
     - SvtAv1EncApp --help  # [unix and build_platform == target_platform]
 
 about:
@@ -39,6 +41,8 @@ about:
   description: |
     The Scalable Video Technology for AV1 (SVT-AV1 Encoder and Decoder) is an
     AV1-compliant encoder/decoder library core.
+  dev_url: https://gitlab.com/AOMediaCodec/SVT-AV1
+  doc_url: https://gitlab.com/AOMediaCodec/SVT-AV1
 
 extra:
   recipe-maintainers:
