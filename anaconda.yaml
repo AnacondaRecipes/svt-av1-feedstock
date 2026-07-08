@@ -1,0 +1,9 @@
+anaconda_config_version: 1
+upstream_sources:
+  - gitlab:
+      identifier: AOMediaCodec/SVT-AV1
+      host: gitlab.com
+      use_max_tag: true
+      include_regex: ^v[\d.]+$
+      from_pattern: ^v(.+)$
+      to_pattern: \1
