@@ -1,5 +1,5 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: t <a@b.c>
+From ac9dac11873546491d769cb7ec74e4fd59158c76 Mon Sep 17 00:00:00 2001
+From: Eric Lundby <elundby@anaconda.com>
 Date: Tue, 20 Oct 2026 08:52:22 -0600
 Subject: [PATCH] Support clang-cl on Windows ARM64 for Neon extensions
 
