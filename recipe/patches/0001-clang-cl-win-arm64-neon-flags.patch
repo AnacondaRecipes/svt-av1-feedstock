@@ -1,0 +1,57 @@
+From ac9dac11873546491d769cb7ec74e4fd59158c76 Mon Sep 17 00:00:00 2001
+From: Eric Lundby <elundby@anaconda.com>
+Date: Tue, 20 Oct 2026 08:52:22 -0600
+Subject: [PATCH] Support clang-cl on Windows ARM64 for Neon extensions
+
+clang-cl does not accept GNU-style -march= flags directly, so the
+DOTPROD objects were compiled without their target
+features and failed on always_inline intrinsics. Pass the flags through
+the /clang: prefix when the compiler frontend is MSVC-like, and do the
+same for -fno-lax-vector-conversions and -ffp-contract=off.
+---
+ CMakeLists.txt                             | 12 +++++++++---
+ Source/Lib/ASM_NEON_DOTPROD/CMakeLists.txt |  8 +++++++-
+ 2 files changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5710057..670c5de 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -182,9 +182,15 @@ svfloat32_t func(svfloat32_t a) {
+     endforeach()
+ 
+     add_definitions(-DARCH_AARCH64=1)
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-lax-vector-conversions")
+-    # Prevents missmatch between arm and x86 bitstreams
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffp-contract=off")
++    if(CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
++        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /clang:-fno-lax-vector-conversions")
++        # Prevents missmatch between arm and x86 bitstreams
++        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /clang:-ffp-contract=off")
++    else()
++        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-lax-vector-conversions")
++        # Prevents missmatch between arm and x86 bitstreams
++        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffp-contract=off")
++    endif()
+ endif()
+ 
+ include(GNUInstallDirs)
+diff --git a/Source/Lib/ASM_NEON_DOTPROD/CMakeLists.txt b/Source/Lib/ASM_NEON_DOTPROD/CMakeLists.txt
+index 91645ea..9dbc54b 100644
+--- a/Source/Lib/ASM_NEON_DOTPROD/CMakeLists.txt
++++ b/Source/Lib/ASM_NEON_DOTPROD/CMakeLists.txt
+@@ -14,7 +14,13 @@
+ # Include Encoder Subdirectories
+ enable_language(ASM) # needed for .S files
+ 
+-check_both_flags_add(-march=armv8.2-a+dotprod)
++if(CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
++  # clang-cl only accepts GNU-style target flags via the /clang: prefix
++  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /clang:-march=armv8.2-a+dotprod")
++  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /clang:-march=armv8.2-a+dotprod")
++else()
++  check_both_flags_add(-march=armv8.2-a+dotprod)
++endif()
+ 
+ add_library(ASM_NEON_DOTPROD OBJECT)
+ target_sources(
