@@ -8,9 +8,11 @@ package:
 source:
   url: https://gitlab.com/AOMediaCodec/{{ name|lower }}/-/archive/v{{ version }}/{{ name|lower }}-v{{ version }}.tar.gz
   sha256: 084720e7818cec7cb38d31ab478478b910d643fe5b13fc2cfcbd9da9c9d5c84b
+  patches:
+    - patches/0001-clang-cl-win-arm64-neon-flags.patch
 
 build:
-  number: 0
+  number: 1
   run_exports:
     # This is just a guess
     - {{ pin_subpackage('svt-av1', max_pin='x.x.x') }}
@@ -21,8 +23,9 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - cmake
+    - ninja-base # [win]
     - make  # [unix]
-    - yasm
+    - yasm  # [not (win and arm64)]
 
 test:
   commands:
