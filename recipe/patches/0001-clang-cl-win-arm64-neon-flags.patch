@@ -4,17 +4,14 @@ Date: Tue, 20 Oct 2026 08:52:22 -0600
 Subject: [PATCH] Support clang-cl on Windows ARM64 for Neon extensions
 
 clang-cl does not accept GNU-style -march= flags directly, so the
-DOTPROD/I8MM/SVE/SVE2 objects were compiled without their target
+DOTPROD objects were compiled without their target
 features and failed on always_inline intrinsics. Pass the flags through
 the /clang: prefix when the compiler frontend is MSVC-like, and do the
 same for -fno-lax-vector-conversions and -ffp-contract=off.
 ---
  CMakeLists.txt                             | 12 +++++++++---
  Source/Lib/ASM_NEON_DOTPROD/CMakeLists.txt |  8 +++++++-
- Source/Lib/ASM_NEON_I8MM/CMakeLists.txt    |  8 +++++++-
- Source/Lib/ASM_SVE/CMakeLists.txt          |  8 +++++++-
- Source/Lib/ASM_SVE2/CMakeLists.txt         |  8 +++++++-
- 5 files changed, 37 insertions(+), 7 deletions(-)
+ 2 files changed, 16 insertions(+), 4 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 5710057..670c5de 100644
@@ -58,60 +55,3 @@ index 91645ea..9dbc54b 100644
  
  add_library(ASM_NEON_DOTPROD OBJECT)
  target_sources(
-diff --git a/Source/Lib/ASM_NEON_I8MM/CMakeLists.txt b/Source/Lib/ASM_NEON_I8MM/CMakeLists.txt
-index 092aa53..15de8f6 100644
---- a/Source/Lib/ASM_NEON_I8MM/CMakeLists.txt
-+++ b/Source/Lib/ASM_NEON_I8MM/CMakeLists.txt
-@@ -14,7 +14,13 @@
- # Include Encoder Subdirectories
- enable_language(ASM) # needed for .S files
- 
--check_both_flags_add(-march=armv8.2-a+dotprod+i8mm)
-+if(CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
-+  # clang-cl only accepts GNU-style target flags via the /clang: prefix
-+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /clang:-march=armv8.2-a+dotprod+i8mm")
-+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /clang:-march=armv8.2-a+dotprod+i8mm")
-+else()
-+  check_both_flags_add(-march=armv8.2-a+dotprod+i8mm)
-+endif()
- 
- add_library(ASM_NEON_I8MM OBJECT)
- target_sources(
-diff --git a/Source/Lib/ASM_SVE/CMakeLists.txt b/Source/Lib/ASM_SVE/CMakeLists.txt
-index e64b7ed..650f1b5 100644
---- a/Source/Lib/ASM_SVE/CMakeLists.txt
-+++ b/Source/Lib/ASM_SVE/CMakeLists.txt
-@@ -15,7 +15,13 @@
- enable_language(ASM) # needed for .S files
- add_library(ASM_SVE OBJECT)
- 
--check_both_flags_add(-march=armv8.2-a+dotprod+i8mm+sve)
-+if(CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
-+  # clang-cl only accepts GNU-style target flags via the /clang: prefix
-+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /clang:-march=armv8.2-a+dotprod+i8mm+sve")
-+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /clang:-march=armv8.2-a+dotprod+i8mm+sve")
-+else()
-+  check_both_flags_add(-march=armv8.2-a+dotprod+i8mm+sve)
-+endif()
- 
- target_sources(
-   ASM_SVE
-diff --git a/Source/Lib/ASM_SVE2/CMakeLists.txt b/Source/Lib/ASM_SVE2/CMakeLists.txt
-index 3e38472..ba5b608 100644
---- a/Source/Lib/ASM_SVE2/CMakeLists.txt
-+++ b/Source/Lib/ASM_SVE2/CMakeLists.txt
-@@ -15,7 +15,13 @@
- enable_language(ASM) # needed for .S files
- add_library(ASM_SVE2 OBJECT)
- 
--check_both_flags_add(-march=armv9-a+i8mm+sve2)
-+if(CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
-+  # clang-cl only accepts GNU-style target flags via the /clang: prefix
-+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /clang:-march=armv9-a+i8mm+sve2")
-+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /clang:-march=armv9-a+i8mm+sve2")
-+else()
-+  check_both_flags_add(-march=armv9-a+i8mm+sve2)
-+endif()
- 
- target_sources(
-   ASM_SVE2

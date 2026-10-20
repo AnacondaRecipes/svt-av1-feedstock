@@ -6,7 +6,7 @@ set "EXTRA_CMAKE_ARGS="
 if "%target_platform%"=="win-arm64" (
   set "CC=clang-cl"
   set "CXX=clang-cl"
-  set "EXTRA_CMAKE_ARGS=-DCMAKE_ASM_COMPILER=clang-cl"
+  set "EXTRA_CMAKE_ARGS=-DCMAKE_ASM_COMPILER=clang-cl -DENABLE_NEON_I8MM=OFF -DENABLE_SVE=OFF -DENABLE_SVE2=OFF"
 )
 
 cmake -G "Ninja"                                     ^

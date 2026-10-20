@@ -33,13 +33,17 @@ test:
     - test -f ${PREFIX}/lib/libSvtAv1Enc${SHLIB_EXT}        # [unix]
     - if not exist %LIBRARY_BIN%\SvtAv1Enc.dll exit 1       # [win]
     - if not exist %LIBRARY_INC%\svt-av1/EbSvtAv1.h exit 1  # [win]
-    - SvtAv1EncApp --help  # [unix and build_platform == target_platform]
+    - SvtAv1EncApp --help
 
 about:
   home: https://gitlab.com/AOMediaCodec/SVT-AV1
-  license: BSD-2-Clause
-  license_family: BSD
-  license_file: LICENSE.md
+  license: BSD-3-Clause-Clear AND BSD-3-Clause AND MIT
+  license_family: Other
+  license_file:
+    - LICENSE.md
+    - PATENTS.md
+    - third_party/fastfeat/LICENSE
+    - third_party/safestringlib/LICENSE
   summary: The Scalable Video Technology for AV1 encoder/decoder library.
   description: |
     The Scalable Video Technology for AV1 (SVT-AV1 Encoder and Decoder) is an
