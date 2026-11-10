@@ -1,5 +1,5 @@
 {% set name = "SVT-AV1" %}
-{% set version = "3.1.2" %}
+{% set version = "4.3.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,12 +7,12 @@ package:
 
 source:
   url: https://gitlab.com/AOMediaCodec/{{ name|lower }}/-/archive/v{{ version }}/{{ name|lower }}-v{{ version }}.tar.gz
-  sha256: 084720e7818cec7cb38d31ab478478b910d643fe5b13fc2cfcbd9da9c9d5c84b
+  sha256: 6ac19aa4f10f8f6ffbf68a455bead75544a7083319a5e1b3728c1a888401a17d
   patches:
     - patches/0001-clang-cl-win-arm64-neon-flags.patch
 
 build:
-  number: 1
+  number: 0
   run_exports:
     # This is just a guess
     - {{ pin_subpackage('svt-av1', max_pin='x.x.x') }}
@@ -23,15 +23,15 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - cmake
-    - ninja-base # [win]
+    - ninja-base  # [win]
     - make  # [unix]
     - yasm  # [not (win and arm64)]
 
 test:
   commands:
-    - test -f ${PREFIX}/include/svt-av1/EbSvtAv1.h          # [unix]
-    - test -f ${PREFIX}/lib/libSvtAv1Enc${SHLIB_EXT}        # [unix]
-    - if not exist %LIBRARY_BIN%\SvtAv1Enc.dll exit 1       # [win]
+    - test -f ${PREFIX}/include/svt-av1/EbSvtAv1.h  # [unix]
+    - test -f ${PREFIX}/lib/libSvtAv1Enc${SHLIB_EXT}  # [unix]
+    - if not exist %LIBRARY_BIN%\SvtAv1Enc.dll exit 1  # [win]
     - if not exist %LIBRARY_INC%\svt-av1/EbSvtAv1.h exit 1  # [win]
     - SvtAv1EncApp --help
 
